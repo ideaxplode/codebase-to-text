@@ -25,7 +25,7 @@ NOTE: This is a Python script that runs in the terminal.
 ## Usage
 
 ### Basic Command-line Syntax
-```python
+```bash
 python codebase-to-text.py D:\projects\my-codebase
 ```
 - Here, `D:\projects\my-codebase` is the path of the source folder (the codebase)
@@ -34,7 +34,7 @@ python codebase-to-text.py D:\projects\my-codebase
 
 ### Exclude Files/Folders
 You can exclude certain files and folders by using the `--exclude` argument:
-```python
+```bash
 python codebase-to-text.py D:\projects\my-codebase --exclude images icons js\jquery.min.js css\bootstrap.css "js\custom script.js"
 ```
 - Multiple exclusion paths should be space-separated
@@ -44,7 +44,7 @@ python codebase-to-text.py D:\projects\my-codebase --exclude images icons js\jqu
 
 ### Debug Mode
 You can run the script in debug mode using the `--debug` argument:
-```python
+```bash
 python codebase-to-text.py D:\projects\my-codebase --debug --exclude js\jquery.min.js
 ```
 - Debug mode will allow you to see the running process
