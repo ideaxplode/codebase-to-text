@@ -50,7 +50,6 @@ def main():
 
     if args.debug:
         print()  # Blank line before exclusion lists
-        # Format the exclusion lists to display paths
         exclude_paths_str = ', '.join(exclude_paths)
         print(f"Exclude Paths: [{exclude_paths_str}]")
         print()  # Blank line after exclusion lists
@@ -67,19 +66,16 @@ def main():
         # Generate the folder structure
         for root, dirs, files in os.walk(input_dir, topdown=True):
             # Exclude the .git folder from the folder tree
-            dirs_to_process = []
-            for d in dirs:
-                relative_dir = os.path.relpath(os.path.join(root, d), input_dir)
-                relative_dir = normalize_path(relative_dir)
-                if relative_dir == '.git':
-                    continue  # Exclude .git silently
-                dirs_to_process.append(d)
-            dirs[:] = dirs_to_process
+            dirs[:] = [d for d in dirs if d != '.git']
 
-            level = root.replace(input_dir, '').count(os.sep)
+            # Compute the relative path from input_dir to root
+            relative_root = os.path.relpath(root, input_dir)
+            relative_root = normalize_path(relative_root)
+            level = 0 if relative_root == '.' else relative_root.count(os.sep) + 1
+
             indent = ' ' * 4 * level
             folder_name = os.path.basename(root)
-            outfile.write(f'{indent}{folder_name}/\n')
+            outfile.write(f'{indent}{folder_name}\\\n')
             subindent = ' ' * 4 * (level + 1)
             for f in files:
                 outfile.write(f'{subindent}{f}\n')
@@ -113,7 +109,7 @@ def main():
                 with open(output_file, 'a', encoding='utf-8') as outfile:
                     # Ensure the previous content ends with a newline
                     outfile.write('\n')  # Blank line before the header
-                    outfile.write(f'********** BELOW IS THE CONTENT OF FILE: {os.sep}{relative_path} **********\n')
+                    outfile.write(f'********** BELOW IS THE CONTENT OF FILE: \\{relative_path.replace(os.sep, "\\")} **********\n')
                     outfile.write('\n')  # Blank line after the header
                     # Read the file and write its content
                     file_path = os.path.join(root, file)
