@@ -12,9 +12,8 @@ NOTE: This is a Python script that runs in the terminal.
 
 - **Single .TXT File**: Concatenates all files in a specified folder into a single .txt output file
 - **Exclusions**: You can exclude certain files and folders from concatenation (e.g. images, libraries etc.) that are not relevant for an LLM to understand. The `.git` folder at the root will be excluded by default
-- **File Headers**: Inserts file headers (file name with path) before inserting the file's code in the output file for LLMs to understand
-- **Folder Tree**: Includes the entire folder and file structure tree of the codebase at the top of the output file -- for LLMs to understand the complete code structure
-- **Debug Mode**: Provides a debug mode for troubleshooting
+- **File Headers**: File headers/markers (file name with path) will be inserted before inserting the file's code in the output file -- for LLMs to understand
+- **Folder Tree**: The entire folder and file structure tree of the codebase will be inserted at the top of the output file -- for LLMs to understand the complete code structure
 
 ## Installation
 
@@ -41,11 +40,3 @@ python codebase-to-text.py D:\projects\my-codebase --exclude images icons js\jqu
 - In the above example, `images` and `icons` are folders
 - All exclusion paths are relative to the source folder's root
 - If a path contains spaces, please enclose it in double quotes
-
-### Debug Mode
-You can run the script in debug mode using the `--debug` argument:
-```bash
-python codebase-to-text.py D:\projects\my-codebase --debug --exclude js\jquery.min.js
-```
-- Debug mode will allow you to see the running process
-- It will also show which files are included/excluded in the output file
