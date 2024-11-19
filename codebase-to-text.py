@@ -6,12 +6,10 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Converts a structured codebase into a single TXT file.')
+        description='Converts a structured codebase into a single .txt file.')
     parser.add_argument('codebase_path', help='Path to the codebase directory.')
     parser.add_argument('--exclude', nargs='*', default=[],
                         help='List of files and folders to exclude, relative to the codebase root.')
-    parser.add_argument('--debug', action='store_true',
-                        help='Enable debug output.')
     return parser.parse_args()
 
 def normalize_path(path):
@@ -48,11 +46,11 @@ def main():
         item_normalized = normalize_path(item)
         exclude_paths.append(item_normalized)
 
-    if args.debug:
-        print()  # Blank line before exclusion lists
-        exclude_paths_str = ', '.join(exclude_paths)
-        print(f"Exclude Paths: [{exclude_paths_str}]")
-        print()  # Blank line after exclusion lists
+    # Print exclusion lists to the console by default
+    print()  # Blank line before exclusion lists
+    exclude_paths_str = ', '.join(exclude_paths)
+    print(f"Exclude Paths: [{exclude_paths_str}]")
+    print()  # Blank line after exclusion lists
 
     output_file = os.path.abspath(input_dir.rstrip(os.sep) + '.txt')
     if os.path.exists(output_file):
@@ -61,7 +59,9 @@ def main():
     # Write folder structure to output file
     with open(output_file, 'w', encoding='utf-8') as outfile:
         outfile.write('\n')
-        outfile.write('********** BELOW IS THE FILE AND FOLDER STRUCTURE OF THE CODEBASE **********\n')
+        outfile.write('NOTE: Below is a compilation (concatenation) of the entire codebase. The first section that is marked by "**********" contains the entire folder and file structure of the codebase. The remaining sections contain the code of each individual file in the codebase (but only relevant individual files are included).\n')
+        outfile.write('\n')
+        outfile.write('********** BELOW IS THE FILE AND FOLDER STRUCTURE OF THE ENTIRE CODEBASE **********\n')
         outfile.write('\n')
         # Generate the folder structure
         for root, dirs, files in os.walk(input_dir, topdown=True):
@@ -75,6 +75,7 @@ def main():
 
             indent = ' ' * 4 * level
             folder_name = os.path.basename(root)
+            # Use backslashes in the folder tree
             outfile.write(f'{indent}{folder_name}\\\n')
             subindent = ' ' * 4 * (level + 1)
             for f in files:
@@ -90,9 +91,9 @@ def main():
             if relative_dir == '.git':
                 continue  # Exclude .git silently
             if is_excluded(relative_dir, exclude_paths):
-                if args.debug:
-                    print(f"Processing Folder: {relative_dir} [EXCLUDED]")
+                print(f"Processing Folder: {relative_dir} [EXCLUDED]")
             else:
+                print(f"Processing Folder: {relative_dir}")
                 dirs_to_process.append(d)
         dirs[:] = dirs_to_process
 
@@ -100,16 +101,15 @@ def main():
             relative_path = os.path.relpath(os.path.join(root, file), input_dir)
             relative_path = normalize_path(relative_path)
             excluded = is_excluded(relative_path, exclude_paths)
-            if args.debug:
-                if excluded:
-                    print(f"Processing File: {relative_path} [EXCLUDED]")
-                else:
-                    print(f"Processing File: {relative_path}")
+            if excluded:
+                print(f"Processing File: {relative_path} [EXCLUDED]")
+            else:
+                print(f"Processing File: {relative_path}")
             if not excluded:
                 with open(output_file, 'a', encoding='utf-8') as outfile:
                     # Ensure the previous content ends with a newline
                     outfile.write('\n')  # Blank line before the header
-                    outfile.write(f'********** BELOW IS THE CONTENT OF FILE: \\{relative_path.replace(os.sep, "\\")} **********\n')
+                    outfile.write(f'********** BELOW IS THE CONTENT OF THE FILE: \\{relative_path.replace(os.sep, "\\")} **********\n')
                     outfile.write('\n')  # Blank line after the header
                     # Read the file and write its content
                     file_path = os.path.join(root, file)
